@@ -14,7 +14,7 @@ public class Employee {
     private String name;
     private int salary;
 
-    @Column(name = "department_Name")
+    @Column(name = "department_id")
     private Long departmentId;
 
     @Column(name = "dept_name")
