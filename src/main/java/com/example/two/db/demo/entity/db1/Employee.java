@@ -12,7 +12,7 @@ public class Employee {
     @Id
     private int id;
     private String name;
-    private int salary;
+    private Integer salary;
 
     @Column(name = "department_id")
     private Long departmentId;

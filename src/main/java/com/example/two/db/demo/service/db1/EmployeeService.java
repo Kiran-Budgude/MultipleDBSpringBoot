@@ -3,6 +3,9 @@ package com.example.two.db.demo.service.db1;
 import com.example.two.db.demo.entity.db1.Employee;
 import com.example.two.db.demo.entity.db2.Department;
 import com.example.two.db.demo.mysql.repository.db1.EmployeeRepository;
+import com.opencsv.CSVWriter;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -10,6 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -52,6 +58,30 @@ public class EmployeeService {
 
         }
     }
+
+    public ByteArrayInputStream getEmployeeCSVFile() throws IOException {
+
+        List<Employee> employeesList = fetchDepartment();
+
+        try (final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+             final CSVPrinter csvPrinter = new CSVPrinter(new PrintWriter(stream), CSVFormat.EXCEL)){
+            for (final Employee employee:employeesList){
+                List<Serializable> data = new ArrayList<>();
+                data.add(employee.getId());
+                data.add(employee.getName() != null ? employee.getName() : "");
+                data.add(employee.getDepartmentId() != null ? employee.getDepartmentId().toString() : "");
+                data.add(employee.getDepartmentName() != null ? employee.getDepartmentName() : "");
+                data.add(employee.getSalary());
+                csvPrinter.printRecord(data);
+            }
+            csvPrinter.flush();
+            return new ByteArrayInputStream(stream.toByteArray());
+
+        }catch (final IOException e) {
+            throw new RuntimeException("Csv writing error: " + e.getMessage());
+        }
+    }
+
 
 
 }

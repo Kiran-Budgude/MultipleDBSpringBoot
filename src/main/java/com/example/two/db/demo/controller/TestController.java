@@ -8,14 +8,27 @@ import com.example.two.db.demo.mysql.repository.db1.EmployeeRepository;
 import com.example.two.db.demo.mysql.repository.db1.SalaryRepository;
 import com.example.two.db.demo.mysql.repository.db2.ManagerRepository;
 import com.example.two.db.demo.service.db1.EmployeeService;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -67,5 +80,34 @@ public class TestController {
     public ResponseEntity<List<Employee>> fetchDepartment(){
         List<Employee> employees= employeeService.fetchDepartment();
         return new ResponseEntity<>(employees, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/getEmployeeFile/{type}")
+    public ResponseEntity<?> getCSVFile(@PathVariable(value = "type") String type) throws IOException {
+        if (type == null || type.equalsIgnoreCase("")) {
+            throw new RuntimeException("Incorrect Type");
+        }
+
+        if (type.equalsIgnoreCase("JSON")) {
+            List<Employee> employees = employeeService.fetchDepartment();
+            return ResponseEntity.ok(employees);
+        }
+
+        if (type.equalsIgnoreCase("CSV")) {
+            String fileSuffix = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".csv";
+            String filename = "EmployeeReport" + fileSuffix;
+            InputStreamResource file = new InputStreamResource(employeeService.getEmployeeCSVFile());
+            byte[] bytes = IOUtils.toByteArray(file.getInputStream());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+            headers.setContentType(MediaType.parseMediaType("application/csv"));
+
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        }
+
+        // Handle unsupported types
+        return ResponseEntity.badRequest().body("Unsupported type: " + type);
     }
 }
