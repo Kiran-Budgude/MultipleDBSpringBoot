@@ -1,4 +1,4 @@
-package com.example.two.db.demo.service.db1;
+package com.example.two.db.demo.service;
 
 import com.example.two.db.demo.entity.db1.Employee;
 import com.example.two.db.demo.entity.db2.Department;
