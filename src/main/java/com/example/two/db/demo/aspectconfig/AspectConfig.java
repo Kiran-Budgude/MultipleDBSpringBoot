@@ -44,13 +44,13 @@ public class AspectConfig {
     @AfterReturning(value = "execution(* com.example.two.db.demo.*.service.*.*(..))", returning = "result")
     public void afterReturning(JoinPoint joinPoint, Object result) {
 
-        logger.info("{} returning with value {}", joinPoint, result != null ? result.toString() : result);
+        logger.info("{} Returning with value {}", joinPoint, result != null ? result.toString() : result);
 
     }
 
     @After(value = "execution(* com.example.two.db.demo.*.service.*.*(..))")
     public void after(JoinPoint joinPoint) {
-        logger.info("after execution of {}", joinPoint);
+        logger.info("After execution of {}", joinPoint);
     }
 
 
