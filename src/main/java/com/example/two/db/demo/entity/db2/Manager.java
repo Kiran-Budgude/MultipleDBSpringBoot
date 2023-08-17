@@ -12,6 +12,17 @@ public class Manager {
     private int id;
     private String name;
     private int salary;
+
+    private String departmentName;
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
     public int getId() {
         return id;
     }
