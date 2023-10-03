@@ -13,21 +13,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = "/v1/notification")
 public class NotificationController {
 
-   @Autowired
-   NotificationService notificationService;
+    @Autowired
+    NotificationService notificationService;
 
 
-   @RequestMapping(value = "/notifySingle",method = RequestMethod.POST)
-    ResponseEntity<?> pushNotification(@RequestBody PushNotificationDto pushNotificationDto){
+    @RequestMapping(value = "/notifySingle", method = RequestMethod.POST)
+    ResponseEntity<?> pushNotification(@RequestBody PushNotificationDto pushNotificationDto) {
 
-         PushDto pushDto = notificationService.execute(pushNotificationDto);
+        ApiResponse apiResponse = new ApiResponse();
+        try {
+            PushDto pushDto = notificationService.execute(pushNotificationDto);
+            apiResponse.setResponse(pushDto);
+            apiResponse.setStatus(HttpStatus.OK);
+            apiResponse.setCode(200);
 
-     return new ResponseEntity<>(pushDto, HttpStatus.OK);
+        } catch (Exception e) {
+            apiResponse.setErrros(e);
+            apiResponse.setCode(500);
+            apiResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
 
-
-   }
-
+    }
 
 
 }
